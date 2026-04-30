@@ -8,7 +8,7 @@ public class Mine : MonoBehaviour
     [Tooltip("Ore를 스폰할 위치입니다.")][SerializeField] Transform parent;
     [Tooltip("소환할 Ore 프리팹입니다.")][SerializeField] Ore orePrefab;
     [Tooltip("가로 세로 몇개씩 소환할지 나타내는 벡터입니다.")][SerializeField] Vector2 array;
-
+    [Tooltip("플레이어")] [SerializeField] Player player;
 
     [SerializeField] List<Ore> oreList = new List<Ore>();
 
@@ -23,6 +23,7 @@ public class Mine : MonoBehaviour
         for (int i = 0; i < array.x * array.y; i++)
         {
             Ore ore = Instantiate(orePrefab, parent);
+            ore.Init(player);
             oreList.Add(ore);
         }
 
