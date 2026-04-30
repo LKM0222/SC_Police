@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum ObjectType { Ore, Money, Item }
+[Serializable] public enum ObjectType { Ore, Money, Item }
 
 // 플레이어 오브젝트를 관리하는 스크립트
 public class Player : MonoBehaviour
@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [Header("Data")]
     [Tooltip("플레이어의 이동 속도")][SerializeField] float speed = 5f; // 플레이어의 이동속도 (초당 단위)
     [Tooltip("플레이어가 바라보는 각도")][SerializeField] float angle = 0f; // 플레이어가 현재 바라보는 각도 (확인용)
+    [Tooltip("카메라 회전 각도를 이동 방향에 적용하기 위해, 카메라의 rotation을 사용")][SerializeField] Transform playerCam;
     [Tooltip("플레이어의 공격 사거리")][SerializeField] float attackRange = 1;
     [Tooltip("플레이어 공격 쿨타임")][SerializeField] float attackCooltime = 0.5f;
     [Tooltip("광물 감지 범위 콜라이더")][SerializeField] BoxCollider attackRangeCollider;
@@ -77,9 +78,16 @@ public class Player : MonoBehaviour
     public void Move(Vector2 vec)
     {
         //atan2 -> 백터의 방향(각도) 구함, rad2dig -> 라디안을 도(degree)로 변환
-        angle = Mathf.Atan2(vec.x, vec.y) * Mathf.Rad2Deg;
+        // 여기서, 카메라 각도 보정값 적용해야됨.
+        // refTransform: 카메라(또는 카메라 피벗)처럼 "이동 기준"이 되는 오브젝트
+        float refYaw = playerCam.eulerAngles.y;
+        Vector3 inputDir = new Vector3(vec.x, 0f, vec.y);
+        Vector3 moveDir = Quaternion.Euler(0f, refYaw, 0f) * inputDir;
 
-        this.transform.position += new Vector3(vec.x, 0f, vec.y) * speed * Time.deltaTime;
+        angle = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
+        
+
+        this.transform.position += moveDir * speed * Time.deltaTime;
         mainCharacterObj.transform.rotation = Quaternion.Euler(0f, angle, 0f);
     }
     #endregion
@@ -155,18 +163,18 @@ public class Player : MonoBehaviour
     {
         yield return null;
         // 원점으로 복귀
-        maxText.transform.position = Vector3.zero;
+        maxText.transform.localPosition = Vector3.zero;
         maxText.gameObject.SetActive(true);
 
-        for (float y = 0f; y <= 1f; y += 0.01f)
+        for (float y = 0f; y <= 1.5f; y += 0.1f)
         {
             // y 값 서서히 위로
-            maxText.transform.position += Vector3.up * y;
+            maxText.transform.localPosition = Vector3.up * y;
             yield return new WaitForSeconds(0.01f);
         }
 
         // 잠깐 대기 후, 텍스트 비활성화
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
         maxText.gameObject.SetActive(false);
     }
     #endregion
