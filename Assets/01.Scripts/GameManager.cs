@@ -17,7 +17,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     // [Header("Data")]
     // [Tooltip("플레이어가 가지고 있는 돈")]
-    // public int money; // 가지고있는 돈
+    public int money; // 가지고있는 돈
     // [Tooltip("크로와상 한개의 가격")]
     // public int croassantPrice; // 크로와상 가격 (7원)
 

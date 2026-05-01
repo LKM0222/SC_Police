@@ -62,12 +62,13 @@ public class CustomerManager : MonoSingleton<CustomerManager>
     {
         nowCustomer.SetDestination(counter.prisonPos);
         nowCustomer.meshRenderer.material = buyFinishMT;
-        
+        var count = nowCustomer.needCount;
+
         prisonList.Add(nowCustomer);
         waitList.Remove(nowCustomer);
 
         SpawnCustomer();
         SetCustomerLine();
-        
+        counter.AddMoney(count);
     }
 }

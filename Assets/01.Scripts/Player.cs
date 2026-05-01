@@ -31,11 +31,13 @@ public class Player : MonoBehaviour
 
     [Header("Have Item Data")]
     [Tooltip("들고있는 광물 갯수")][SerializeField] int oreHaveCount;
-    [Tooltip("들고있는 돈 갯수")][SerializeField] int moneyHaveCount;
     [Tooltip("들고있는 아이템 갯수")][SerializeField] int itemHaveCount;
 
     [Header("UI")]
     [Tooltip("플레이어가 광물을 가득 들었을 때 나타내는 UI")][SerializeField] GameObject maxText;
+
+    [SerializeField] GameObject moneyPref;
+    [SerializeField] GameObject moneyListTransform; // 리스트 오브젝트 (돈이 없을 때, 있을 때, 위치 변경필요)
 
 
 
@@ -116,7 +118,7 @@ public class Player : MonoBehaviour
                     oreHaveCount = Math.Clamp(oreHaveCount + 1, 0, oreObjList.Count);
                 }
                 break;
-            case ObjectType.Money: moneyHaveCount++; break;
+            case ObjectType.Money: GameManager.Instance.money++; break;
             case ObjectType.Item: itemHaveCount = Math.Clamp(itemHaveCount + 1, 0, itemObjList.Count); break;
         }
 
@@ -139,9 +141,20 @@ public class Player : MonoBehaviour
 
             case ObjectType.Money:
                 {
+                    if (GameManager.Instance.money > moneyObjList.Count)
+                    {
+                        int missing = GameManager.Instance.money - moneyObjList.Count;
+                        for (int i = 0; i < missing; i++)
+                        {
+                            var newItem = Instantiate(moneyPref, moneyListTransform.transform);
+                            newItem.transform.localPosition = moneyObjList[moneyObjList.Count - 1].transform.localPosition + (Vector3.up * 0.25f);
+                            moneyObjList.Add(newItem);
+                        }
+                    }
+
                     for (int i = 0; i < moneyObjList.Count; i++)
                     {
-                        moneyObjList[i].SetActive(i < moneyHaveCount);
+                        moneyObjList[i].SetActive(i < GameManager.Instance.money);
                     }
                 }
                 break;
@@ -155,6 +168,9 @@ public class Player : MonoBehaviour
                 }
                 break;
         }
+
+        // 돈을 들고 있을땐, 유저에게 가까이 붙임.
+        moneyListTransform.transform.localPosition = oreHaveCount <= 0 ? Vector3.forward * -0.8f : Vector3.forward * -1.5f;
     }
     #endregion
 
@@ -261,8 +277,8 @@ public class Player : MonoBehaviour
             case ObjectType.Money:
                 {
                     moneyObjList.ForEach(x => x.SetActive(false));
-                    result = moneyHaveCount;
-                    moneyHaveCount = 0;
+                    result = GameManager.Instance.money;
+                    GameManager.Instance.money = 0;
                 }
                 break;
             case ObjectType.Item:
@@ -273,6 +289,8 @@ public class Player : MonoBehaviour
                 }
                 break;
         }
+
+        SetListObj(type);
 
         return result;
     }

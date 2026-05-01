@@ -28,7 +28,7 @@ public class MainUI : MonoBehaviour
     // 플레이어가 가진 돈을 새로고침하는 함수
     void Refresh()
     {
-        // moneyText.text = GameManager.Instance.money.ToString();
+        moneyText.text = GameManager.Instance.money.ToString();
     }
     #endregion
 

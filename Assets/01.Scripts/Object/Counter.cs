@@ -5,7 +5,9 @@ using UnityEngine;
 public class Counter : MonoBehaviour
 {
     [SerializeField] List<GameObject> itemList;
+    [SerializeField] List<GameObject> moneyList;
     [SerializeField] int nowItemCount = 0;
+    [SerializeField] int nowMoneyCount = 0;
 
     [SerializeField] GameObject itemPref;
     [SerializeField] Transform itemParent;
@@ -19,6 +21,7 @@ public class Counter : MonoBehaviour
 
 
     Coroutine stackItemCoroutine = null;
+    Coroutine getMoneyCoroutine = null;
 
     private void OnEnable()
     {
@@ -30,6 +33,10 @@ public class Counter : MonoBehaviour
         for (int i = 0; i < itemList.Count; i++)
         {
             itemList[i].SetActive(i < nowItemCount);
+        }
+        for (int i = 0; i < moneyList.Count; i++)
+        {
+            moneyList[i].SetActive(i < nowMoneyCount);
         }
     }
 
@@ -66,4 +73,31 @@ public class Counter : MonoBehaviour
         itemList[nowItemCount-- - 1].SetActive(false);
     }
 
+    public void AddMoney(int count)
+    {
+        for (int i = nowMoneyCount; i < nowMoneyCount + count; i++)
+        {
+            moneyList[i].SetActive(true);
+        }
+
+        nowMoneyCount += count;
+    }
+
+    public void GetMoney(Player player)
+    {
+        if (getMoneyCoroutine == null) getMoneyCoroutine = StartCoroutine(GetMoneyCoroutine(player));
+    }
+
+    IEnumerator GetMoneyCoroutine(Player player)
+    {
+        for (int i = 0; i < nowMoneyCount; i++)
+        {
+            player.GetObject(ObjectType.Money);
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        moneyList.ForEach(x => x.SetActive(false));
+        nowMoneyCount = 0;
+        getMoneyCoroutine = null;
+    }
 }
