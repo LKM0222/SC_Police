@@ -53,7 +53,7 @@ public class Ore : MonoBehaviour
         obj.SetActive(false);
         destoryParticle.gameObject.SetActive(true);
         player.DestroyOre(this);
-        player.GetObejct(ObjectType.Ore);
+        player.GetObject(ObjectType.Ore);
 
         // 리스폰 코루틴 실행
         if (respawnCoroutine != null)

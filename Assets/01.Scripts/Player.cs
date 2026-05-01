@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -40,7 +41,7 @@ public class Player : MonoBehaviour
 
     Coroutine maxTextFloatingCoroutine = null;
     bool CanStackOre => oreHaveCount < oreObjList.Count;
-    
+
 
 
     #region Life Cycle
@@ -85,7 +86,7 @@ public class Player : MonoBehaviour
         Vector3 moveDir = Quaternion.Euler(0f, refYaw, 0f) * inputDir;
 
         angle = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
-        
+
 
         this.transform.position += moveDir * speed * Time.deltaTime;
         mainCharacterObj.transform.rotation = Quaternion.Euler(0f, angle, 0f);
@@ -94,7 +95,7 @@ public class Player : MonoBehaviour
 
     #region Public Method
     // 아이템을 얻었을 때, 리스트 업데이트 위한 함수
-    public void GetObejct(ObjectType type)
+    public void GetObject(ObjectType type)
     {
         switch (type)
         {
@@ -241,5 +242,49 @@ public class Player : MonoBehaviour
             Ore ore = other.gameObject.GetComponent<Ore>();
             DestroyOre(ore);
         }
+    }
+
+    // 들고있는 아이템 반환
+    public int ReturnObj(ObjectType type)
+    {
+        int result = 0;
+
+        switch (type)
+        {
+            case ObjectType.Ore:
+                {
+                    oreObjList.ForEach(x => x.SetActive(false));
+                    result = oreHaveCount;
+                    oreHaveCount = 0;
+                }
+                break;
+            case ObjectType.Money:
+                {
+                    moneyObjList.ForEach(x => x.SetActive(false));
+                    result = moneyHaveCount;
+                    moneyHaveCount = 0;
+                }
+                break;
+            case ObjectType.Item:
+                {
+                    itemObjList.ForEach(x => x.SetActive(false));
+                    result = itemHaveCount;
+                    itemHaveCount = 0;
+                }
+                break;
+        }
+
+        return result;
+    }
+
+    // 아이템 획득 (갯수 제한이 있어서, 최대로 들 수 있는 갯수라면 못가져오도록)
+    public bool GetItem()
+    {
+        if (itemHaveCount < itemObjList.Count)
+        {
+            GetObject(ObjectType.Item);
+            return true;
+        }
+        else return false;
     }
 }
