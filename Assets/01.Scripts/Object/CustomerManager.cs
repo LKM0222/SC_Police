@@ -15,7 +15,8 @@ public class CustomerManager : MonoSingleton<CustomerManager>
     public Counter counter;
 
     public Customer nowCustomer => waitList[0];
-
+    
+    public Prison prison;
 
 
     [SerializeField] GameObject customerPrefab; // 손님 프리팹
@@ -60,7 +61,8 @@ public class CustomerManager : MonoSingleton<CustomerManager>
 
     public void NextCustomer()
     {
-        nowCustomer.SetDestination(counter.prisonPos);
+        nowCustomer.SetDestination(prison.GetPrisonPos);
+        prison.AddCount();
         nowCustomer.meshRenderer.material = buyFinishMT;
         var count = nowCustomer.needCount;
 

@@ -14,9 +14,6 @@ public class Counter : MonoBehaviour
 
     [SerializeField] GameObject NPC;
 
-    // 임시
-    public Transform prisonPos;
-
     public int GetItemCount() => nowItemCount;
 
 
