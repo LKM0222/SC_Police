@@ -14,6 +14,8 @@ public class GameManager : MonoSingleton<GameManager>
 
 
     public Player player;
+    public MakeMachine machine;
+
 
     [Header("Data")]
     public int money; // 가지고있는 돈

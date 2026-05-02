@@ -17,8 +17,8 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
     
     public int mineLevel = 1;
     public bool openNPC;
-    public bool openMineWorker;
     public bool openPrison;
+    public List<MineWorker> workerList;
 
     public void OpenUpgrade(UpgradeType type)
     {
@@ -64,6 +64,7 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
                 {
                     Debug.Log($"Mine Worker 개방");
                     upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.MineWorker)).upgradeObj.SetActive(false);
+                    workerList.ForEach(x => x.gameObject.SetActive(true));
 
                     upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.NPC)).upgradeObj.SetActive(true);
                 }

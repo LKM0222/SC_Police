@@ -216,8 +216,10 @@ public class Player : MonoBehaviour
             {
                 if (nowCount >= canAttackTargetCount) break;
 
-                if (!targetOreList[i].isDestory)
+                // 광물이 파괴되지 않았고, 광물을 캐고 있는 사람이 없을때만 플레이어가 광물을 캘 수 있음
+                if (!targetOreList[i].isDestory && targetOreList[i].own == null)
                 {
+                    targetOreList[i].own = this.gameObject;
                     targetOreList[i].Mined(atk);
                     nowCount++; // 캔 광물 수 더해줌
                 }

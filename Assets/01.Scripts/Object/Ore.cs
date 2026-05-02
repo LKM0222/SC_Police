@@ -8,7 +8,7 @@ public class Ore : MonoBehaviour
 {
     [Header("Data")]
     [Tooltip("광물 실제 오브젝트")][SerializeField] GameObject obj;
-    [Tooltip("광물의 체력")] float hp = 2;
+    [Tooltip("광물의 체력")] [SerializeField] float hp = 2;
     [Tooltip("파괴 후, 다시 리스폰되는 시간")][SerializeField] float respawnTime;
     public bool isDestory => !obj.activeSelf;
 
@@ -18,6 +18,8 @@ public class Ore : MonoBehaviour
 
     Coroutine respawnCoroutine = null;
     Player player;
+
+    public GameObject own; // 현재 캐고있는 광물 주인
 
 
 
@@ -31,6 +33,7 @@ public class Ore : MonoBehaviour
     public void Spawn()
     {
         obj.SetActive(true);
+        own = null;
         destoryParticle.gameObject.SetActive(false);
     }
 
@@ -47,6 +50,40 @@ public class Ore : MonoBehaviour
             Destory();
         }
     }
+
+    public bool WorkersMined(float atk)
+    {
+        Debug.Log($"채광 {this.name}");
+        if (isDestory)
+        {
+            //머신에 +1 해줘야됨.
+            GameManager.Instance.machine.AddOre(1);
+            return true;
+        }
+        else
+        {
+            hp -= atk;
+
+            // 체력이 0일때 파괴
+            if (hp <= 0)
+            {
+                obj.SetActive(false);
+                destoryParticle.gameObject.SetActive(true);
+                GameManager.Instance.machine.AddOre(1);
+
+                // 리스폰 코루틴 실행
+                if (respawnCoroutine != null)
+                {
+                    StopCoroutine(respawnCoroutine);
+                    respawnCoroutine = null;
+                }
+
+                respawnCoroutine = StartCoroutine(RespawnCoroutine());
+            }
+
+            return false;
+        }
+    }   
 
     private void Destory()
     {
