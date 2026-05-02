@@ -15,9 +15,7 @@ public class Player : MonoBehaviour
     [Tooltip("플레이어가 바라보는 각도")][SerializeField] float angle = 0f; // 플레이어가 현재 바라보는 각도 (확인용)
     [Tooltip("카메라 회전 각도를 이동 방향에 적용하기 위해, 카메라의 rotation을 사용")][SerializeField] Transform playerCam;
     [Tooltip("플레이어의 공격 사거리")][SerializeField] float attackRange = 1;
-    [Tooltip("플레이어 공격 쿨타임")][SerializeField] float attackCooltime = 0.5f;
     [Tooltip("광물 감지 범위 콜라이더")][SerializeField] BoxCollider attackRangeCollider;
-    [Tooltip("플레이어가 한번에 공격할 수 있는 수량")][SerializeField] float canAttackTargetCount = 1;
     [Tooltip("플레이어의 공격범위에 들어온 광물")][SerializeField] List<Ore> targetOreList = new List<Ore>();
     [Tooltip("공격력 (광물의 체력은 2)")] float atk = 2;
 
@@ -32,6 +30,7 @@ public class Player : MonoBehaviour
     [Header("Have Item Data")]
     [Tooltip("들고있는 광물 갯수")][SerializeField] int oreHaveCount;
     [Tooltip("들고있는 아이템 갯수")][SerializeField] int itemHaveCount;
+    [SerializeField] int maxOreCount = 10;
 
     [Header("UI")]
     [Tooltip("플레이어가 광물을 가득 들었을 때 나타내는 UI")][SerializeField] GameObject maxText;
@@ -42,7 +41,10 @@ public class Player : MonoBehaviour
 
 
     Coroutine maxTextFloatingCoroutine = null;
-    bool CanStackOre => oreHaveCount < oreObjList.Count;
+    bool CanStackOre => oreHaveCount < maxOreCount;
+    public int GetMoneyCount => GameManager.Instance.money;
+    float attackCooltime => UpgradeManager.Instance.mineLevel == 1 ? 0.5f : 0.01f; // 공격 쿨타임
+    int canAttackTargetCount => UpgradeManager.Instance.mineLevel * 2 - 1; // 공격 범위
 
 
 
@@ -50,10 +52,6 @@ public class Player : MonoBehaviour
     private void Start()
     {
         Init();
-    }
-    private void Update()
-    {
-        DrawDebugLine();
     }
     #endregion
 
@@ -274,13 +272,6 @@ public class Player : MonoBehaviour
                     oreHaveCount = 0;
                 }
                 break;
-            case ObjectType.Money:
-                {
-                    moneyObjList.ForEach(x => x.SetActive(false));
-                    result = GameManager.Instance.money;
-                    GameManager.Instance.money = 0;
-                }
-                break;
             case ObjectType.Item:
                 {
                     itemObjList.ForEach(x => x.SetActive(false));
@@ -304,5 +295,18 @@ public class Player : MonoBehaviour
             return true;
         }
         else return false;
+    }
+
+    public void PayMoney(int cost)
+    {
+        moneyObjList.ForEach(x => x.SetActive(false));
+        GameManager.Instance.money -= cost;
+        SetListObj(ObjectType.Money);
+    }
+
+    public void SetFindRange(int level)
+    {
+        attackRangeCollider.size = new Vector3(level * 1.5f, 1, 0.5f);
+        maxOreCount += level * 10; 
     }
 }

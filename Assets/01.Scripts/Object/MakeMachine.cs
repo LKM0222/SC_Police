@@ -14,6 +14,11 @@ public class MakeMachine : MonoBehaviour
     [SerializeField] List<GameObject> oreList;
     [SerializeField] GameObject makeOreObj; // 생선중인 ore(애니메이션용)
 
+    [SerializeField] GameObject orePref;
+    [SerializeField] Transform oreListObj; // 광물 parent
+
+    Vector3 leftOrePos => oreList[0].transform.localPosition;
+    Vector3 rightOrePos => oreList[1].transform.localPosition;
 
     Coroutine makeCoroutine = null;
     Coroutine addCoroutine = null;
@@ -77,6 +82,18 @@ public class MakeMachine : MonoBehaviour
     {
         while (tempCount > 0)
         {
+            // 리스트의 갯수가 모자르다면, 광물 생성
+            if (oreCount >= oreList.Count)
+            {
+                var ore = Instantiate(orePref, oreListObj);
+
+                float yPos = oreList.Count / 2 * 0.5f;
+                float zPos = oreList.Count % 2 == 0 ? leftOrePos.z : rightOrePos.z;
+
+                ore.transform.localPosition = new Vector3(0, yPos, zPos);
+                oreList.Add(ore);
+            }
+
             oreList[oreCount].SetActive(true);
             oreCount++;
             tempCount--;
