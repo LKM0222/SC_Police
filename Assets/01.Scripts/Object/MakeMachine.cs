@@ -23,7 +23,7 @@ public class MakeMachine : MonoBehaviour
     Coroutine makeCoroutine = null;
     Coroutine addCoroutine = null;
     Coroutine returnItemCoroutine = null;
-
+    Coroutine npcWaitCoroutine = null;
     private void OnEnable()
     {
         Init();
@@ -111,7 +111,7 @@ public class MakeMachine : MonoBehaviour
             itemList[(itemCount--) - 1].SetActive(false);
             yield return new WaitForSeconds(0.01f);
         }
-        
+
         returnItemCoroutine = null;
     }
 
@@ -119,5 +119,26 @@ public class MakeMachine : MonoBehaviour
     public void GetItme(Player player)
     {
         if (returnItemCoroutine == null) returnItemCoroutine = StartCoroutine(ReturnItemCoroutine(player));
+    }
+
+
+    // npc가 아이템 들기
+    public void GetItem_NPC(ServeNPC npc)
+    {
+        if (npcWaitCoroutine == null) npcWaitCoroutine = StartCoroutine(NPCWaitCoroutine(npc));
+    }
+
+    IEnumerator NPCWaitCoroutine(ServeNPC npc)
+    {
+        yield return new WaitUntil(() => itemCount > 0);
+        npc.GetItem(itemCount);
+        itemList[(itemCount--) - 1].SetActive(false);
+        while (itemCount > 0)
+        {
+            itemList[(itemCount--) - 1].SetActive(false);
+            yield return new WaitForSeconds(0.01f);
+        }
+        
+        npcWaitCoroutine = null;
     }
 }

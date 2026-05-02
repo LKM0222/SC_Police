@@ -43,9 +43,36 @@ public class Counter : MonoBehaviour
         if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(player));
     }
 
+    public void StackItem(ServeNPC npc)
+    {
+        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(npc));
+    }
+
     IEnumerator StackItemCoroutine(Player player)
     {
         nowItemCount += player.ReturnObj(ObjectType.Item);
+        if (nowItemCount > itemList.Count)
+        {
+            int missing = nowItemCount - itemList.Count;
+            for (int i = 0; i < missing; i++)
+            {
+                var newItem = Instantiate(itemPref, itemParent);
+                newItem.transform.localPosition = itemList[itemList.Count - 1].transform.localPosition + (Vector3.up * 0.5f);
+                itemList.Add(newItem);
+            }
+        }
+        int showCount = Mathf.Min(nowItemCount, itemList.Count);
+        for (int i = 0; i < showCount; i++)
+        {
+            itemList[i].SetActive(true);
+            yield return new WaitForSeconds(0.01f);
+        }
+        stackItemCoroutine = null;
+    }
+
+    IEnumerator StackItemCoroutine(ServeNPC npc)
+    {
+        nowItemCount += npc.ReturnItem();
         if (nowItemCount > itemList.Count)
         {
             int missing = nowItemCount - itemList.Count;
