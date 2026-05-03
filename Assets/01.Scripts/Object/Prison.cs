@@ -14,11 +14,12 @@ public class Prison : MonoBehaviour
     [SerializeField] TMP_Text countText; // 현재 감옥 카운트 텍스트
 
     [SerializeField] Transform prisonPos; // 감옥 위치
-    public Transform GetPrisonPos => prisonPos;
+    [SerializeField] Transform maxPrisonPos; // 감옥이 가득 찼을 경우 위치
 
     Coroutine maxTextColorCorountine = null;
 
     public bool isMax => count >= maxCount;
+    public Transform GetPrisonPos => isMax ? maxPrisonPos : prisonPos;
 
     void Start()
     {
@@ -35,6 +36,10 @@ public class Prison : MonoBehaviour
             {
                 if (maxTextColorCorountine == null) maxTextColorCorountine = StartCoroutine(MaxTextColorCoroutine());
             }
+        }
+        else
+        {
+            UpgradeManager.Instance.SetUpgradeZone(UpgradeType.Prison, true);
         }
     }
 
@@ -60,4 +65,11 @@ public class Prison : MonoBehaviour
         maxTextColorCorountine = null;
     }
 
+    public void OpenArea()
+    {
+        backWall.gameObject.SetActive(false);
+        addArea.gameObject.SetActive(true);
+        maxCount = 40;
+        countText.text = $"{count:D2}/{maxCount:D2}";
+    }
 }

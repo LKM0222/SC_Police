@@ -15,6 +15,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     public Player player;
     public MakeMachine machine;
+    public Counter counter;
 
 
     [Header("Data")]

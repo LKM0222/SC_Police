@@ -11,11 +11,6 @@ public class MineWorker : MonoBehaviour
     [SerializeField] Queue<Ore> targetList = new Queue<Ore>();
     [SerializeField] Ore nowTarget;
 
-    void Start()
-    {
-        this.gameObject.SetActive(false);
-    }
-
     void OnEnable()
     {
         StartCoroutine(MineWorkerMining());

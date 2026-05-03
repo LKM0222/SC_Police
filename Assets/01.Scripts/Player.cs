@@ -40,10 +40,12 @@ public class Player : MonoBehaviour
     [Tooltip("최대로 들 수 있는 광물의 갯수")][SerializeField] int maxOreCount = 10;
 
     /// 프로퍼티
-    bool CanStackOre => oreHaveCount < maxOreCount; // 광물을 캘 수 있는지 여부
+    public bool CanStackOre => oreHaveCount < maxOreCount; // 광물을 캘 수 있는지 여부
     public int GetMoneyCount => GameManager.Instance.money; // GameManager에 저장된 Money값
     float attackCooltime => UpgradeManager.Instance.mineLevel == 1 ? 0.5f : 0.01f; // 공격 쿨타임
     int canAttackTargetCount => UpgradeManager.Instance.mineLevel * 2 - 1; // 공격 범위
+    public int OreHaveCount => oreHaveCount;
+    public int ItemHaveCount => itemHaveCount;
 
     /// 코루틴
     Coroutine maxTextFloatingCoroutine = null; 

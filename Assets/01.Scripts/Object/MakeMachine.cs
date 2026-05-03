@@ -18,13 +18,19 @@ public class MakeMachine : MonoBehaviour
     [SerializeField] GameObject orePref;
     [SerializeField] Transform oreListObj; // 광물 parent
 
+    public int OreCount => oreCount;
+    public int ItemCount => itemCount;
     Vector3 leftOrePos => oreList[0].transform.localPosition;
     Vector3 rightOrePos => oreList[1].transform.localPosition;
+
 
     Coroutine makeCoroutine = null;
     Coroutine addCoroutine = null;
     Coroutine returnItemCoroutine = null;
     Coroutine npcWaitCoroutine = null;
+
+
+
     private void OnEnable()
     {
         Init();

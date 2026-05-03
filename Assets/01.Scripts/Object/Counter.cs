@@ -15,6 +15,7 @@ public class Counter : MonoBehaviour
     [SerializeField] GameObject NPC;
 
     public int GetItemCount() => nowItemCount;
+    public int NowMoneyCount => nowMoneyCount;
 
 
     Coroutine stackItemCoroutine = null;

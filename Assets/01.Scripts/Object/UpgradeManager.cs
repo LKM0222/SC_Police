@@ -14,9 +14,8 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
 {
     public List<UpgradeObject> upgradeObjectList;
 
-    
     public int mineLevel = 1;
-    public bool openPrison;
+    public Prison prison; 
     public List<MineWorker> workerList;
     public ServeNPC npc;
 
@@ -31,7 +30,7 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
     {
         if (!isGetMoneyFirst && GameManager.Instance.money > 0)
         {
-            upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.Weapon2)).upgradeObj.SetActive(true);
+            SetUpgradeZone(UpgradeType.Weapon2, true);
             isGetMoneyFirst = true;
         }
     }
@@ -48,19 +47,19 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
             case UpgradeType.Weapon2:
                 {
                     Debug.Log($"weapon2 개방");
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.Weapon2)).upgradeObj.SetActive(false);
+                    SetUpgradeZone(UpgradeType.Weapon2, false);
                     mineLevel++;
                     GameManager.Instance.player.SetFindRange(mineLevel);
 
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.Weapon3)).upgradeObj.SetActive(true);
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.MineWorker)).upgradeObj.SetActive(true);
+                    SetUpgradeZone(UpgradeType.Weapon3, true);
+                    SetUpgradeZone(UpgradeType.MineWorker, true);
                 }
                 break;
 
             case UpgradeType.Weapon3:
                 {
                     Debug.Log($"weapon3 개방");
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.Weapon3)).upgradeObj.SetActive(false);
+                    SetUpgradeZone(UpgradeType.Weapon3, false);
                     mineLevel++;
                     GameManager.Instance.player.SetFindRange(mineLevel);
                 }
@@ -69,7 +68,7 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
             case UpgradeType.NPC:
                 {
                     Debug.Log($"npc 개방");
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.NPC)).upgradeObj.SetActive(false);
+                    SetUpgradeZone(UpgradeType.NPC, false);
                     npc.gameObject.SetActive(true);
                 }
                 break;
@@ -77,21 +76,28 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
             case UpgradeType.Prison:
                 {
                     Debug.Log($"Prison 개방");
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.Prison)).upgradeObj.SetActive(false);
+                    SetUpgradeZone(UpgradeType.Prison, false);
+                    prison.OpenArea();
                 }
                 break;
 
             case UpgradeType.MineWorker:
                 {
                     Debug.Log($"Mine Worker 개방");
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.MineWorker)).upgradeObj.SetActive(false);
+                    SetUpgradeZone(UpgradeType.MineWorker, false);
+                    
                     workerList.ForEach(x => x.gameObject.SetActive(true));
 
-                    upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.NPC)).upgradeObj.SetActive(true);
+                    SetUpgradeZone(UpgradeType.NPC, true);
                 }
                 break;
         }
 
         SoundManager.Instance.PlaySound(SoundType.BuySuccess);
+    }
+
+    public void SetUpgradeZone(UpgradeType type, bool active)
+    {
+        upgradeObjectList.Find(x => x.upgardeType.Equals(type)).upgradeObj.SetActive(active);
     }
 }
