@@ -8,7 +8,7 @@ public class Ore : MonoBehaviour
 {
     [Header("Data")]
     [Tooltip("광물 실제 오브젝트")][SerializeField] GameObject obj;
-    [Tooltip("광물의 체력")] [SerializeField] float hp = 2;
+    [Tooltip("광물의 체력")][SerializeField] float hp = 2;
     [Tooltip("파괴 후, 다시 리스폰되는 시간")][SerializeField] float respawnTime;
     public bool isDestory => !obj.activeSelf;
 
@@ -42,6 +42,8 @@ public class Ore : MonoBehaviour
     {
         if (isDestory) return;
 
+        PlaySound(UpgradeManager.Instance.mineLevel);
+
         hp -= atk;
 
         // 체력이 0일때 파괴
@@ -53,7 +55,8 @@ public class Ore : MonoBehaviour
 
     public bool WorkersMined(float atk)
     {
-        Debug.Log($"채광 {this.name}");
+        PlaySound(1);
+
         if (isDestory)
         {
             //머신에 +1 해줘야됨.
@@ -83,7 +86,7 @@ public class Ore : MonoBehaviour
 
             return false;
         }
-    }   
+    }
 
     private void Destory()
     {
@@ -108,4 +111,10 @@ public class Ore : MonoBehaviour
         Spawn();
     }
 
+
+    private void PlaySound(int level)
+    {
+        if (level == 1) SoundManager.Instance.PlaySound(SoundType.Mining_level1);
+        else SoundManager.Instance.PlaySound(SoundType.Mining_level2);
+    }
 }

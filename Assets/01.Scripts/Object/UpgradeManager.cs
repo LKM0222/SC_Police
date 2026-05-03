@@ -16,9 +16,30 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
 
     
     public int mineLevel = 1;
-    public bool openNPC;
     public bool openPrison;
     public List<MineWorker> workerList;
+    public ServeNPC npc;
+
+    [SerializeField] private bool isGetMoneyFirst = false;
+
+    void Start()
+    {
+        Init();
+    }
+
+    void Update()
+    {
+        if (!isGetMoneyFirst && GameManager.Instance.money > 0)
+        {
+            upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.Weapon2)).upgradeObj.SetActive(true);
+            isGetMoneyFirst = true;
+        }
+    }
+
+    private void Init()
+    {
+        upgradeObjectList.ForEach(x => x.upgradeObj.SetActive(false));
+    }
 
     public void OpenUpgrade(UpgradeType type)
     {
@@ -49,7 +70,7 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
                 {
                     Debug.Log($"npc 개방");
                     upgradeObjectList.Find(x => x.upgardeType.Equals(UpgradeType.NPC)).upgradeObj.SetActive(false);
-                    openNPC = true;
+                    npc.gameObject.SetActive(true);
                 }
                 break;
 
@@ -70,5 +91,7 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
                 }
                 break;
         }
+
+        SoundManager.Instance.PlaySound(SoundType.BuySuccess);
     }
 }

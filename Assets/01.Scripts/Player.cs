@@ -10,6 +10,16 @@ using UnityEngine.Events;
 // 플레이어 오브젝트를 관리하는 스크립트
 public class Player : MonoBehaviour
 {
+
+    [Header("Turn Object")]
+    [Tooltip("플레이어 회전 시 실제로 회전하는 오브젝트")][SerializeField] GameObject mainCharacterObj; // 실제로 회전하는 오브젝트
+
+    [Header("UI")]
+    [Tooltip("플레이어가 광물을 가득 들었을 때 나타내는 UI")][SerializeField] GameObject maxText;
+
+    [Tooltip("플레이어가 들고있는 돈 오브젝트 프리팹")][SerializeField] GameObject moneyPref;
+    [Tooltip("돈 프리펩 리스트 오브젝트")][SerializeField] GameObject moneyListTransform;
+
     [Header("Data")]
     [Tooltip("플레이어의 이동 속도")][SerializeField] float speed = 5f; // 플레이어의 이동속도 (초당 단위)
     [Tooltip("플레이어가 바라보는 각도")][SerializeField] float angle = 0f; // 플레이어가 현재 바라보는 각도 (확인용)
@@ -19,9 +29,6 @@ public class Player : MonoBehaviour
     [Tooltip("플레이어의 공격범위에 들어온 광물")][SerializeField] List<Ore> targetOreList = new List<Ore>();
     [Tooltip("공격력 (광물의 체력은 2)")] float atk = 2;
 
-    [Header("Turn Object")]
-    [Tooltip("플레이어 회전 시 실제로 회전하는 오브젝트")][SerializeField] GameObject mainCharacterObj; // 실제로 회전하는 오브젝트
-
     [Header("Items")]
     [Tooltip("광물 오브젝트 리스트")][SerializeField] List<GameObject> oreObjList = new List<GameObject>();
     [Tooltip("돈 오브젝트 리스트")][SerializeField] List<GameObject> moneyObjList = new List<GameObject>();
@@ -30,22 +37,16 @@ public class Player : MonoBehaviour
     [Header("Have Item Data")]
     [Tooltip("들고있는 광물 갯수")][SerializeField] int oreHaveCount;
     [Tooltip("들고있는 아이템 갯수")][SerializeField] int itemHaveCount;
-    [SerializeField] int maxOreCount = 10;
+    [Tooltip("최대로 들 수 있는 광물의 갯수")][SerializeField] int maxOreCount = 10;
 
-    [Header("UI")]
-    [Tooltip("플레이어가 광물을 가득 들었을 때 나타내는 UI")][SerializeField] GameObject maxText;
-
-    [SerializeField] GameObject moneyPref;
-    [SerializeField] GameObject moneyListTransform; // 리스트 오브젝트 (돈이 없을 때, 있을 때, 위치 변경필요)
-
-
-
-    Coroutine maxTextFloatingCoroutine = null;
-    bool CanStackOre => oreHaveCount < maxOreCount;
-    public int GetMoneyCount => GameManager.Instance.money;
+    /// 프로퍼티
+    bool CanStackOre => oreHaveCount < maxOreCount; // 광물을 캘 수 있는지 여부
+    public int GetMoneyCount => GameManager.Instance.money; // GameManager에 저장된 Money값
     float attackCooltime => UpgradeManager.Instance.mineLevel == 1 ? 0.5f : 0.01f; // 공격 쿨타임
     int canAttackTargetCount => UpgradeManager.Instance.mineLevel * 2 - 1; // 공격 범위
 
+    /// 코루틴
+    Coroutine maxTextFloatingCoroutine = null; 
 
 
     #region Life Cycle
@@ -78,18 +79,42 @@ public class Player : MonoBehaviour
     // 플레이어의 이동을 담당하는 함수
     public void Move(Vector2 vec)
     {
-        //atan2 -> 백터의 방향(각도) 구함, rad2dig -> 라디안을 도(degree)로 변환
         // 여기서, 카메라 각도 보정값 적용해야됨.
-        // refTransform: 카메라(또는 카메라 피벗)처럼 "이동 기준"이 되는 오브젝트
         float refYaw = playerCam.eulerAngles.y;
         Vector3 inputDir = new Vector3(vec.x, 0f, vec.y);
         Vector3 moveDir = Quaternion.Euler(0f, refYaw, 0f) * inputDir;
 
+        //atan2 -> 백터의 방향(각도) 구함, rad2dig -> 라디안을 도(degree)로 변환
         angle = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
-
 
         this.transform.position += moveDir * speed * Time.deltaTime;
         mainCharacterObj.transform.rotation = Quaternion.Euler(0f, angle, 0f);
+    }
+    #endregion
+
+    #region Priave Method
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.layer.Equals(6))
+        {
+            Ore ore = other.gameObject.GetComponent<Ore>();
+            if (ore != null && !targetOreList.Contains(ore))
+            {
+                if (!ore.isDestory)
+                {
+                    targetOreList.Add(ore);
+                }
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.layer.Equals(6))
+        {
+            Ore ore = other.gameObject.GetComponent<Ore>();
+            DestroyOre(ore);
+        }
     }
     #endregion
 
@@ -170,97 +195,7 @@ public class Player : MonoBehaviour
         // 돈을 들고 있을땐, 유저에게 가까이 붙임.
         moneyListTransform.transform.localPosition = oreHaveCount <= 0 ? Vector3.forward * -0.8f : Vector3.forward * -1.5f;
     }
-    #endregion
 
-    #region Coroutine
-    // MaxText를 띄우는 코루틴
-    IEnumerator MaxTextFloatCoroutine()
-    {
-        yield return null;
-        // 원점으로 복귀
-        maxText.transform.localPosition = Vector3.zero;
-        maxText.gameObject.SetActive(true);
-
-        for (float y = 0f; y <= 1.5f; y += 0.1f)
-        {
-            // y 값 서서히 위로
-            maxText.transform.localPosition = Vector3.up * y;
-            yield return new WaitForSeconds(0.01f);
-        }
-
-        // 잠깐 대기 후, 텍스트 비활성화
-        yield return new WaitForSeconds(0.1f);
-        maxText.gameObject.SetActive(false);
-    }
-    #endregion
-
-
-    //일단 구현해두는, 광석 캐는 로직
-    private void DrawDebugLine()
-    {
-        Debug.DrawRay(mainCharacterObj.transform.position, mainCharacterObj.transform.forward * attackRange, Color.red);
-    }
-
-
-    IEnumerator Mining()
-    {
-        while (true)
-        {
-            yield return null;
-            // 광물이 없을땐 뛰어넘기
-            if (targetOreList.Count < 0) continue;
-
-            // 광물캐기
-            int nowCount = 0;
-            for (int i = 0; i < targetOreList.Count; i++)
-            {
-                if (nowCount >= canAttackTargetCount) break;
-
-                // 광물이 파괴되지 않았고, 광물을 캐고 있는 사람이 없을때만 플레이어가 광물을 캘 수 있음
-                if (!targetOreList[i].isDestory && targetOreList[i].own == null)
-                {
-                    targetOreList[i].own = this.gameObject;
-                    targetOreList[i].Mined(atk);
-                    nowCount++; // 캔 광물 수 더해줌
-                }
-            }
-
-            // 캐고나서 공격 쿨타임 대기
-            yield return new WaitForSeconds(attackCooltime);
-        }
-    }
-
-    public void DestroyOre(Ore ore)
-    {
-        targetOreList.Remove(ore);
-    }
-
-    // 그러면 일단, 광물을 리스트에 어떻게 넣을지 고민해봐야됨.
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.layer.Equals(6))
-        {
-            Ore ore = other.gameObject.GetComponent<Ore>();
-            if (ore != null && !targetOreList.Contains(ore))
-            {
-                if (!ore.isDestory)
-                {
-                    targetOreList.Add(ore);
-                }
-            }
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.layer.Equals(6))
-        {
-            Ore ore = other.gameObject.GetComponent<Ore>();
-            DestroyOre(ore);
-        }
-    }
-
-    // 들고있는 아이템 반환
     public int ReturnObj(ObjectType type)
     {
         int result = 0;
@@ -311,4 +246,60 @@ public class Player : MonoBehaviour
         attackRangeCollider.size = new Vector3(level * 1.5f, 1, 0.5f);
         maxOreCount += level * 10; 
     }
+
+    public void DestroyOre(Ore ore)
+    {
+        targetOreList.Remove(ore);
+    }
+    #endregion
+
+    #region Coroutine
+    // MaxText를 띄우는 코루틴
+    IEnumerator MaxTextFloatCoroutine()
+    {
+        yield return null;
+        // 원점으로 복귀
+        maxText.transform.localPosition = Vector3.zero;
+        maxText.gameObject.SetActive(true);
+
+        for (float y = 0f; y <= 1.5f; y += 0.1f)
+        {
+            // y 값 서서히 위로
+            maxText.transform.localPosition = Vector3.up * y;
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        // 잠깐 대기 후, 텍스트 비활성화
+        yield return new WaitForSeconds(0.1f);
+        maxText.gameObject.SetActive(false);
+    }
+
+    IEnumerator Mining()
+    {
+        while (true)
+        {
+            yield return null;
+            // 광물이 없을땐 뛰어넘기
+            if (targetOreList.Count < 0) continue;
+
+            // 광물캐기
+            int nowCount = 0;
+            for (int i = 0; i < targetOreList.Count; i++)
+            {
+                if (nowCount >= canAttackTargetCount) break;
+
+                // 광물이 파괴되지 않았고, 광물을 캐고 있는 사람이 없을때만 플레이어가 광물을 캘 수 있음
+                if (!targetOreList[i].isDestory && targetOreList[i].own == null)
+                {
+                    targetOreList[i].own = this.gameObject;
+                    targetOreList[i].Mined(atk);
+                    nowCount++; // 캔 광물 수 더해줌
+                }
+            }
+
+            // 캐고나서 공격 쿨타임 대기
+            yield return new WaitForSeconds(attackCooltime);
+        }
+    }
+    #endregion
 }

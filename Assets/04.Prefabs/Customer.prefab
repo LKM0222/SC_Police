@@ -102,7 +102,7 @@ MonoBehaviour:
   nav: {fileID: 7104446757994190865}
   needCount: 0
   enoughCount: 0
-  buySpeed: 1
+  buySpeed: 0.5
   meshRenderer: {fileID: 7938636156622874021}
 --- !u!195 &7104446757994190865
 NavMeshAgent:

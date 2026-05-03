@@ -50,7 +50,8 @@ public class Counter : MonoBehaviour
 
     IEnumerator StackItemCoroutine(Player player)
     {
-        nowItemCount += player.ReturnObj(ObjectType.Item);
+        int playerNeedItemCount = player.ReturnObj(ObjectType.Item);
+        nowItemCount += playerNeedItemCount;
         if (nowItemCount > itemList.Count)
         {
             int missing = nowItemCount - itemList.Count;
@@ -64,9 +65,11 @@ public class Counter : MonoBehaviour
         int showCount = Mathf.Min(nowItemCount, itemList.Count);
         for (int i = 0; i < showCount; i++)
         {
-            itemList[i].SetActive(true);
+            itemList[i].SetActive(i < showCount);
             yield return new WaitForSeconds(0.01f);
         }
+
+        if (playerNeedItemCount > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking);
         stackItemCoroutine = null;
     }
 
@@ -84,9 +87,9 @@ public class Counter : MonoBehaviour
             }
         }
         int showCount = Mathf.Min(nowItemCount, itemList.Count);
-        for (int i = 0; i < showCount; i++)
+        for (int i = 0; i < itemList.Count; i++)
         {
-            itemList[i].SetActive(true);
+            itemList[i].SetActive(i < showCount);
             yield return new WaitForSeconds(0.01f);
         }
         stackItemCoroutine = null;
@@ -99,6 +102,7 @@ public class Counter : MonoBehaviour
 
     public void AddMoney(int count)
     {
+        SoundManager.Instance.PlaySound(SoundType.PayMoney);
         for (int i = nowMoneyCount; i < nowMoneyCount + count; i++)
         {
             moneyList[i].SetActive(true);
@@ -109,6 +113,7 @@ public class Counter : MonoBehaviour
 
     public void GetMoney(Player player)
     {
+        
         if (getMoneyCoroutine == null) getMoneyCoroutine = StartCoroutine(GetMoneyCoroutine(player));
     }
 
@@ -120,6 +125,9 @@ public class Counter : MonoBehaviour
             yield return new WaitForSeconds(0.01f);
         }
 
+        // 가져갈 돈이 있는 경우에만 사운드 출력
+        if (nowMoneyCount > 0) SoundManager.Instance.PlaySound(SoundType.GetMoney);
+        
         moneyList.ForEach(x => x.SetActive(false));
         nowMoneyCount = 0;
         getMoneyCoroutine = null;

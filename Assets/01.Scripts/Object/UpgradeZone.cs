@@ -18,11 +18,17 @@ public class UpgradeZone : MonoBehaviour
     [SerializeField] int needMoneyCount;
     [SerializeField] int nowMoneyCount;
 
+    [SerializeField] GameObject virtualCam;
+
     Coroutine payMoneyCoroutine = null;
+
+    void OnEnable()
+    {
+        StartCoroutine(EnableCoroutine());
+    }
 
     private void Update()
     {
-
         SetUpgradeZoneState();
     }
 
@@ -65,17 +71,31 @@ public class UpgradeZone : MonoBehaviour
     IEnumerator PayMoneyCoroutine(Player player)
     {
         yield return null;
+
         while (needMoneyCount > nowMoneyCount)
         {
             yield return new WaitUntil(() => player.GetMoneyCount > 0);
             player.PayMoney(1);
             nowMoneyCount++;
+            SoundManager.Instance.PlaySound(SoundType.BuyUpgrade);
             yield return new WaitForSeconds(0.01f);
         }
 
         // 지불 완료, 동작 실행
-        Debug.Log($"Open {upgradeType}");
         UpgradeManager.Instance.OpenUpgrade(upgradeType);
         payMoneyCoroutine = null;
+    }
+
+    IEnumerator EnableCoroutine()
+    {
+        if (virtualCam == null) yield break;
+
+        virtualCam.SetActive(true);
+        GameManager.Instance.canInput = false;
+
+        yield return new WaitForSeconds(2f);
+
+        virtualCam.SetActive(false);
+        GameManager.Instance.canInput = true;
     }
 }

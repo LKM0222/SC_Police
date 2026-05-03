@@ -65,13 +65,4 @@ public class MineWorker : MonoBehaviour
             }
         }
     }
-
-    void OnTriggerExit(Collider other)
-    {
-        // if (other.gameObject.layer.Equals(6))
-        // {
-        //     var ore = other.GetComponent<Ore>();
-        //     if(Queue.)
-        // }
-    }
 }

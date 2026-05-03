@@ -9,7 +9,8 @@ public class MakeMachine : MonoBehaviour
     [SerializeField] int itemCount;
     [SerializeField] int oreCount;
 
-    [SerializeField] float makeTime;
+    [SerializeField] float makeTerm;
+    [SerializeField] float makeTime; 
     [SerializeField] List<GameObject> itemList;
     [SerializeField] List<GameObject> oreList;
     [SerializeField] GameObject makeOreObj; // 생선중인 ore(애니메이션용)
@@ -54,7 +55,7 @@ public class MakeMachine : MonoBehaviour
 
     IEnumerator MakeCoroutine()
     {
-        yield return new WaitForSeconds(makeTime);
+        yield return new WaitForSeconds(makeTerm);
         while (oreCount > 0)
         {
             yield return new WaitUntil(() => itemCount < itemList.Count);
@@ -67,13 +68,14 @@ public class MakeMachine : MonoBehaviour
             for (float i = 0.65f; i > -0.6f; i -= 0.01f)
             {
                 makeOreObj.transform.localPosition = new Vector3(0f, makeOrePos.y, i);
-                yield return new WaitForSeconds(0.01f);
+                yield return new WaitForSeconds(makeTime);
             }
 
             yield return new WaitForSeconds(0.01f);
 
             itemList[itemCount].SetActive(true);
             itemCount++;
+            SoundManager.Instance.PlaySound(SoundType.ItemMaking);
         }
         makeCoroutine = null;
     }
@@ -104,14 +106,17 @@ public class MakeMachine : MonoBehaviour
 
     IEnumerator ReturnItemCoroutine(Player player)
     {
+        int temp = itemCount;
+
         while (itemCount > 0)
         {
             if (!player.GetItem()) break; // 만약, 더이상 들 수 없다면 함수 종료
-
+            SoundManager.Instance.PlaySound(SoundType.GetItem);
             itemList[(itemCount--) - 1].SetActive(false);
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(0.1f);
         }
 
+        // if(itemCount > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking); // 아이템이 있는 경우에만 사운드 출력
         returnItemCoroutine = null;
     }
 

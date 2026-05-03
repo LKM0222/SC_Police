@@ -45,7 +45,7 @@ public class Customer : MonoBehaviour
     {
         yield return new WaitUntil(() => nav.remainingDistance < 0.01f);
         yield return new WaitUntil(() => CustomerManager.Instance.counter.GetItemCount() > 0);
-        yield return new WaitForSeconds(1f); // 잠깐 기다린 후, 구매 시작
+        // yield return new WaitForSeconds(1f); // 잠깐 기다린 후, 구매 시작
 
         for (int i = 0; i < needCount; i++)
         {
@@ -55,6 +55,8 @@ public class Customer : MonoBehaviour
 
             CustomerManager.Instance.counter.GetItem();
             enoughCount++;
+
+            SoundManager.Instance.PlaySound(SoundType.GetItem);
         }
 
         // 구매 완료하면, 캐릭터 색상 변경 후, 감옥으로 이동, wait에서 삭제 후, 다음 손님 스폰

@@ -13,12 +13,13 @@ public class MachineZone : MonoBehaviour
         if (other.gameObject.layer.Equals(3))
         {
             var player = other.GetComponent<Player>();
+            
             if (enterZoneCoroutine != null)
             {
                 StopCoroutine(enterZoneCoroutine);
                 enterZoneCoroutine = null;
             }
-
+            
             enterZoneCoroutine = StartCoroutine(EnterZoneCoroutine(player));
         }
     }
@@ -34,7 +35,10 @@ public class MachineZone : MonoBehaviour
     IEnumerator EnterZoneCoroutine(Player player)
     {
         zoneImg.color = Color.green;
-        machine.AddOre(player.ReturnObj(ObjectType.Ore));
+        int playerOreCount = player.ReturnObj(ObjectType.Ore);
+        machine.AddOre(playerOreCount);
+
+        if (playerOreCount > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking);
 
         for (float i = 1; i < 1.2f; i += 0.01f)
         {

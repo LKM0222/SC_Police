@@ -16,6 +16,7 @@ public class ServeNPC : MonoBehaviour
 
     bool isHaveItem => itemCount > 0;
 
+    #region Life Cycle
     void Start()
     {
         SetObjList();
@@ -25,7 +26,36 @@ public class ServeNPC : MonoBehaviour
     {
         StartCoroutine(ServeNPCCoroutine());
     }
+    #endregion
 
+    #region Private Method
+    private void SetObjList()
+    {
+        for (int i = 0; i < itemList.Count; i++)
+        {
+            itemList[i].SetActive(i < itemCount);
+        }
+    }
+    #endregion
+    
+    #region Public Method
+    public void GetItem(int count)
+    {
+        itemCount = count;
+
+        SetObjList();
+    }
+
+    public int ReturnItem()
+    {
+        int result = itemCount;
+        itemCount = 0;
+        SetObjList();
+        return result;
+    }
+    #endregion
+
+    #region Coroutine
     IEnumerator ServeNPCCoroutine()
     {
         yield return null;
@@ -46,28 +76,5 @@ public class ServeNPC : MonoBehaviour
             }
         }
     }
-
-    private void SetObjList()
-    {
-        for (int i = 0; i < itemList.Count; i++)
-        {
-            itemList[i].SetActive(i < itemCount);
-        }
-    }
-    public void GetItem(int count)
-    {
-        itemCount = count;
-
-        SetObjList();
-    }
-
-    public int ReturnItem()
-    {
-        int result = itemCount;
-        itemCount = 0;
-        SetObjList();
-        return result;
-    }
-
-
+    #endregion
 }
