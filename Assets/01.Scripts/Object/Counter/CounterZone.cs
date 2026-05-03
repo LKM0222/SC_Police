@@ -14,30 +14,42 @@ public class CounterZone : MonoBehaviour
     // 중복방지 코루틴
     Coroutine enterZoneCoroutine = null;
 
-    #region Coroutine
-    IEnumerator EnterZoneCoroutine(Player player)
+    #region Private Method
+    private void EnterZone_Player(Player player)
     {
-        zoneImg.color = Color.green;
+        if (player.ItemHaveCount <= 0) return;
+
         counter.StackItem(player);
 
-        for (float i = 1; i < 1.2f; i += 0.01f)
+        if (enterZoneCoroutine != null)
         {
-            transform.localScale = nomalScale * i;
-            yield return new WaitForSeconds(0.0001f);
-        }
-        for (float i = 1.2f; i > 1f; i -= 0.01f)
-        {
-            transform.localScale = nomalScale * i;
-            yield return new WaitForSeconds(0.0001f);
+            StopCoroutine(enterZoneCoroutine);
+            enterZoneCoroutine = null;
         }
 
-        enterZoneCoroutine = null;
+        enterZoneCoroutine = StartCoroutine(EnterZoneCoroutine());
     }
 
-    IEnumerator EnterZoneCoroutine(ServeNPC npc)
+    private void EnterZone_NPC(ServeNPC npc)
+    {
+        if (!npc.isHaveItem) return;
+
+        counter.StackItem(npc);
+        
+        if (enterZoneCoroutine != null)
+        {
+            StopCoroutine(enterZoneCoroutine);
+            enterZoneCoroutine = null;
+        }
+
+        enterZoneCoroutine = StartCoroutine(EnterZoneCoroutine());
+    }
+    #endregion
+
+    #region Coroutine
+    IEnumerator EnterZoneCoroutine()
     {
         zoneImg.color = Color.green;
-        counter.StackItem(npc);
 
         for (float i = 1; i < 1.2f; i += 0.01f)
         {
@@ -60,27 +72,13 @@ public class CounterZone : MonoBehaviour
         if (other.gameObject.layer.Equals(3))
         {
             var player = other.GetComponent<Player>();
-
-            if (enterZoneCoroutine != null)
-            {
-                StopCoroutine(enterZoneCoroutine);
-                enterZoneCoroutine = null;
-            }
-
-            enterZoneCoroutine = StartCoroutine(EnterZoneCoroutine(player));
+            EnterZone_Player(player);            
         }
 
         if (other.gameObject.layer.Equals(11))
         {
             var npc = other.GetComponent<ServeNPC>();
-
-            if (enterZoneCoroutine != null)
-            {
-                StopCoroutine(enterZoneCoroutine);
-                enterZoneCoroutine = null;
-            }
-
-            enterZoneCoroutine = StartCoroutine(EnterZoneCoroutine(npc));
+            EnterZone_NPC(npc);
         }
     }
 

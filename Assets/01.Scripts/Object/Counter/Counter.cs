@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,17 +37,27 @@ public class Counter : MonoBehaviour
     #region Public Method
     public void StackItem(Player player)
     {
-        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(player));
+        int count = player.ReturnObj(ObjectType.Item);
+        if (count > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking);
+            
+        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(count));
     }
 
     public void StackItem(ServeNPC npc)
-    {
-        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(npc));
+    {   
+        int count = npc.ReturnItem();
+        
+        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(count));
     }
 
     public void GetItem()
     {
-        itemList[nowItemCount-- - 1].SetActive(false);
+        for (int i = itemList.Count - 1; i >= nowItemCount ; i--)
+        {
+            itemList[i].SetActive(false);
+        }
+
+        itemList[(nowItemCount--) - 1].SetActive(false);
     }
 
     public void AddMoney(int count)
@@ -82,10 +93,9 @@ public class Counter : MonoBehaviour
     #endregion
 
     #region Coroutine
-    IEnumerator StackItemCoroutine(Player player)
+    IEnumerator StackItemCoroutine(int itemCount)
     {
-        int playerNeedItemCount = player.ReturnObj(ObjectType.Item);
-        nowItemCount += playerNeedItemCount;
+        nowItemCount += itemCount;
         if (nowItemCount > itemList.Count)
         {
             int missing = nowItemCount - itemList.Count;
@@ -96,32 +106,11 @@ public class Counter : MonoBehaviour
                 itemList.Add(newItem);
             }
         }
+
+        itemList.ForEach(x => x.gameObject.SetActive(false));
+
         int showCount = Mathf.Min(nowItemCount, itemList.Count);
         for (int i = 0; i < showCount; i++)
-        {
-            itemList[i].SetActive(i < showCount);
-            yield return new WaitForSeconds(0.01f);
-        }
-
-        if (playerNeedItemCount > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking);
-        stackItemCoroutine = null;
-    }
-
-    IEnumerator StackItemCoroutine(ServeNPC npc)
-    {
-        nowItemCount += npc.ReturnItem();
-        if (nowItemCount > itemList.Count)
-        {
-            int missing = nowItemCount - itemList.Count;
-            for (int i = 0; i < missing; i++)
-            {
-                var newItem = Instantiate(itemPref, itemParent);
-                newItem.transform.localPosition = itemList[itemList.Count - 1].transform.localPosition + (Vector3.up * 0.5f);
-                itemList.Add(newItem);
-            }
-        }
-        int showCount = Mathf.Min(nowItemCount, itemList.Count);
-        for (int i = 0; i < itemList.Count; i++)
         {
             itemList[i].SetActive(i < showCount);
             yield return new WaitForSeconds(0.01f);

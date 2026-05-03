@@ -13,7 +13,7 @@ public class ServeNPC : MonoBehaviour
     [Tooltip("NPC가 들고 있는 아이템 수")][SerializeField] int itemCount = 0;
 
     // 프로퍼티
-    bool isHaveItem => itemCount > 0;
+    public bool isHaveItem => itemCount > 0;
 
     #region Life Cycle
     void Start()
