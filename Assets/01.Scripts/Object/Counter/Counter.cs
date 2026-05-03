@@ -4,28 +4,70 @@ using UnityEngine;
 
 public class Counter : MonoBehaviour
 {
-    [SerializeField] List<GameObject> itemList;
-    [SerializeField] List<GameObject> moneyList;
-    [SerializeField] int nowItemCount = 0;
-    [SerializeField] int nowMoneyCount = 0;
+    [Header("Data")]
+    [Tooltip("카운터에 쌓아 두는 아이템 오브젝트 리스트")][SerializeField] List<GameObject> itemList;
+    [Tooltip("카운터에 생성되는 돈 오브젝트 리스트")][SerializeField] List<GameObject> moneyList;
 
-    [SerializeField] GameObject itemPref;
-    [SerializeField] Transform itemParent;
+    [Tooltip("현재 카운터에 생성된 아이템 카운트")][SerializeField] int nowItemCount = 0;
+    [Tooltip("현재 카운터에 생성된 돈 카운트")][SerializeField] int nowMoneyCount = 0;
 
-    [SerializeField] GameObject NPC;
+    [Header("Prefab")]
+    [Tooltip("추가적으로 생성할 아이템 오브젝트")][SerializeField] GameObject itemPref;
+    [Tooltip("아이템 오브젝트를 생성할 Transform (parent)")][SerializeField] Transform itemParent;
 
+    [Header("NPC")]
+    [Tooltip("카운터에서 아이템을 운반할 NPC (퀘스트 완료 시 순차개방)")][SerializeField] GameObject NPC;
+
+    // 프로퍼티
     public int GetItemCount() => nowItemCount;
     public int NowMoneyCount => nowMoneyCount;
 
-
+    // 중복 방지 코루틴
     Coroutine stackItemCoroutine = null;
     Coroutine getMoneyCoroutine = null;
 
+    #region Life Cycle
     private void OnEnable()
     {
         Init();
     }
+    #endregion
 
+    #region Public Method
+    public void StackItem(Player player)
+    {
+        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(player));
+    }
+
+    public void StackItem(ServeNPC npc)
+    {
+        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(npc));
+    }
+
+    public void GetItem()
+    {
+        itemList[nowItemCount-- - 1].SetActive(false);
+    }
+
+    public void AddMoney(int count)
+    {
+        SoundManager.Instance.PlaySound(SoundType.PayMoney);
+        for (int i = nowMoneyCount; i < nowMoneyCount + count; i++)
+        {
+            moneyList[i].SetActive(true);
+        }
+
+        nowMoneyCount += count;
+    }
+
+    public void GetMoney(Player player)
+    {
+        
+        if (getMoneyCoroutine == null) getMoneyCoroutine = StartCoroutine(GetMoneyCoroutine(player));
+    }
+    #endregion
+    
+    #region Private Method
     private void Init()
     {
         for (int i = 0; i < itemList.Count; i++)
@@ -37,18 +79,9 @@ public class Counter : MonoBehaviour
             moneyList[i].SetActive(i < nowMoneyCount);
         }
     }
+    #endregion
 
-
-    public void StackItem(Player player)
-    {
-        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(player));
-    }
-
-    public void StackItem(ServeNPC npc)
-    {
-        if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(npc));
-    }
-
+    #region Coroutine
     IEnumerator StackItemCoroutine(Player player)
     {
         int playerNeedItemCount = player.ReturnObj(ObjectType.Item);
@@ -96,28 +129,6 @@ public class Counter : MonoBehaviour
         stackItemCoroutine = null;
     }
 
-    public void GetItem()
-    {
-        itemList[nowItemCount-- - 1].SetActive(false);
-    }
-
-    public void AddMoney(int count)
-    {
-        SoundManager.Instance.PlaySound(SoundType.PayMoney);
-        for (int i = nowMoneyCount; i < nowMoneyCount + count; i++)
-        {
-            moneyList[i].SetActive(true);
-        }
-
-        nowMoneyCount += count;
-    }
-
-    public void GetMoney(Player player)
-    {
-        
-        if (getMoneyCoroutine == null) getMoneyCoroutine = StartCoroutine(GetMoneyCoroutine(player));
-    }
-
     IEnumerator GetMoneyCoroutine(Player player)
     {
         for (int i = 0; i < nowMoneyCount; i++)
@@ -133,4 +144,5 @@ public class Counter : MonoBehaviour
         nowMoneyCount = 0;
         getMoneyCoroutine = null;
     }
+    #endregion
 }

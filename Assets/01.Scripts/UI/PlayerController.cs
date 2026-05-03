@@ -10,21 +10,16 @@ using UnityEngine.EventSystems;
 public class PlayerController : MonoBehaviour, IPointerUpHandler, IDragHandler, IPointerDownHandler
 {
     [Header("JoyStick")]
-    [Tooltip("JoyStick의 배경입니다.")]
-    [SerializeField] private RectTransform joystick;
+    [Tooltip("JoyStick의 배경")][SerializeField] private RectTransform joystick;
 
-    [Tooltip("Joystick 안에 움직이는 레버입니다.")]
-    [SerializeField] private RectTransform lever;
+    [Tooltip("Joystick 안에 움직이는 레버")][SerializeField] private RectTransform lever;
 
-    [Tooltip("현재 터치 포인트를 알려주는 포인트입니다.")]
-    [SerializeField] GameObject point;
+    [Tooltip("현재 터치 포인트를 알려주는 포인트")][SerializeField] GameObject point;
 
-    [Tooltip("레버가 배경의 얼마만큼까지 나갈 수 있는지 정하는 변수입니다.")]
-    [SerializeField, Range(10f, 150f)] private float leverRange;
+    [Tooltip("레버가 배경의 얼마만큼까지 나갈 수 있는지 정하는 변수")][SerializeField, Range(10f, 150f)] private float leverRange;
 
     [Header("Debug")]
-    [Tooltip("현재 입력된 Vector 값입니다.")]
-    [SerializeField] private Vector2 inputVector;
+    [Tooltip("현재 입력된 Vector 값")][SerializeField] private Vector2 inputVector;
 
     [Header("Player")]
     [SerializeField] Player player;

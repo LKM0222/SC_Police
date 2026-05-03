@@ -5,17 +5,22 @@ using UnityEngine.AI;
 
 public class MineWorker : MonoBehaviour
 {
-    [SerializeField] NavMeshAgent nav;
-    [SerializeField] float atk;
-    [SerializeField] float atkSpd = 0.5f;
-    [SerializeField] Queue<Ore> targetList = new Queue<Ore>();
-    [SerializeField] Ore nowTarget;
+    [Header("Data")]
+    [Tooltip("광부의 공격력 (광물 체력은 항상 2)")][SerializeField] float atk;
+    [Tooltip("광부의 채광 속도")][SerializeField] float atkSpd = 0.5f;
+    [Tooltip("현재 광부가 채광하고 있는 오브젝트")][SerializeField] Ore nowTarget;
+    [Tooltip("광부의 NavMeshAgent")][SerializeField] NavMeshAgent nav;
 
+    [Tooltip("광물의 타겟 범위에 들어온 큐")][SerializeField] Queue<Ore> targetList = new Queue<Ore>();
+
+    #region Life Cycle
     void OnEnable()
     {
         StartCoroutine(MineWorkerMining());
     }
+    #endregion
 
+    #region Coroutine   
     IEnumerator MineWorkerMining()
     {
         while (true)
@@ -38,13 +43,15 @@ public class MineWorker : MonoBehaviour
             }
 
             yield return new WaitUntil(() => nav.remainingDistance <= nav.stoppingDistance);
-            
-            nowTarget.WorkersMined(atk);
+
+            nowTarget.Mind_Workers(atk);
             if (nowTarget.isDestory) nowTarget = null;
             yield return new WaitForSeconds(Random.Range(atkSpd, atkSpd + 0.5f));
         }
     }
+    #endregion
 
+    #region Trigger
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer.Equals(6))
@@ -56,4 +63,5 @@ public class MineWorker : MonoBehaviour
             }
         }
     }
+    #endregion
 }

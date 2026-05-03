@@ -294,7 +294,7 @@ public class Player : MonoBehaviour
                 if (!targetOreList[i].isDestory && targetOreList[i].own == null)
                 {
                     targetOreList[i].own = this.gameObject;
-                    targetOreList[i].Mined(atk);
+                    targetOreList[i].Mined_Player(atk);
                     nowCount++; // 캔 광물 수 더해줌
                 }
             }

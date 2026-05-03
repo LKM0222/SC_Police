@@ -12,34 +12,25 @@ public class UpgradeObject
 
 public class UpgradeManager : MonoSingleton<UpgradeManager>
 {
-    public List<UpgradeObject> upgradeObjectList;
 
-    public int mineLevel = 1;
-    public Prison prison; 
-    public List<MineWorker> workerList;
-    public ServeNPC npc;
+    [Header("Data")]
+    [Tooltip("현재 플레이어 채광 레벨")]public int mineLevel = 1;
+    [Tooltip("업그레이드 할 감옥")]public Prison prison; 
+    [Tooltip("잠금해제 시 활성화 할 광부 리스트")]public List<MineWorker> workerList;
+    [Tooltip("잠금해제 시 활성화 할 NPC")]public ServeNPC npc;
+    // [Tooltip("업그레이드 시작 위해 ")][SerializeField] private bool isGetMoneyFirst = false;
 
-    [SerializeField] private bool isGetMoneyFirst = false;
+    [Header("UpgradeZone List")]
+    [Tooltip("특정 상황에 활성화 할 UpgradeZone 리스트")]public List<UpgradeObject> upgradeObjectList;
 
+    #region LifeCycle
     void Start()
     {
         Init();
     }
+    #endregion
 
-    void Update()
-    {
-        if (!isGetMoneyFirst && GameManager.Instance.money > 0)
-        {
-            SetUpgradeZone(UpgradeType.Weapon2, true);
-            isGetMoneyFirst = true;
-        }
-    }
-
-    private void Init()
-    {
-        upgradeObjectList.ForEach(x => x.upgradeObj.SetActive(false));
-    }
-
+    #region Public Method
     public void OpenUpgrade(UpgradeType type)
     {
         switch (type)
@@ -100,4 +91,12 @@ public class UpgradeManager : MonoSingleton<UpgradeManager>
     {
         upgradeObjectList.Find(x => x.upgardeType.Equals(type)).upgradeObj.SetActive(active);
     }
+    #endregion
+
+    #region Private Method
+    private void Init()
+    {
+        upgradeObjectList.ForEach(x => x.upgradeObj.SetActive(false));
+    }
+    #endregion
 }

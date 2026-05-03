@@ -5,25 +5,28 @@ using UnityEngine;
 public class Mine : MonoBehaviour
 {
     [Header("Mine Data")]
-    [Tooltip("Ore를 스폰할 위치입니다.")][SerializeField] Transform parent;
-    [Tooltip("소환할 Ore 프리팹입니다.")][SerializeField] Ore orePrefab;
-    [Tooltip("가로 세로 몇개씩 소환할지 나타내는 벡터입니다.")][SerializeField] Vector2 array;
-    [Tooltip("플레이어")] [SerializeField] Player player;
-
-    [SerializeField] List<Ore> oreList = new List<Ore>();
+    [Tooltip("Ore를 스폰할 위치")][SerializeField] Transform parent;
+    [Tooltip("소환할 Ore 프리팹")][SerializeField] Ore orePrefab;
+    [Tooltip("가로 세로 몇개씩 소환할지 나타내는 벡터")][SerializeField] Vector2 array;
+    [Tooltip("현재 소환되어있는 Ore 리스트")][SerializeField] List<Ore> oreList = new List<Ore>();
 
     bool isInit = false; // 초기화 체크
+
+    #region Life Cycle
     void Start()
     {
         if (!isInit) Init();
     }
+    #endregion
 
-    void Init()
+    #region Private Method
+    // 게임 시작 시, 광물을 스폰하는 함수
+    private void Init()
     {
         for (int i = 0; i < array.x * array.y; i++)
         {
             Ore ore = Instantiate(orePrefab, parent);
-            ore.Init(player);
+            ore.Init();
             oreList.Add(ore);
         }
 
@@ -37,4 +40,5 @@ public class Mine : MonoBehaviour
             }
         }
     }
+    #endregion
 }

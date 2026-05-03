@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
-[Serializable]
-public enum TutorialType { Mine, Machine, MachineStack, Counter, CounterMoney }
+// 튜토리얼에서 사용하는 화살표 오브젝트 종류
+[Serializable] public enum TutorialType { Mine, Machine, MachineStack, Counter, CounterMoney }
 
-[Serializable]
-public enum TutorialProgressType { NONE, MineStart, MineFinish, MachineOreStack, GetItem, PutDownCounter, WaitCreateCounterMoney, GetCounterMoney }
+// 현재 튜토리얼 단게
+[Serializable] public enum TutorialProgressType { NONE, MineStart, MineFinish, MachineOreStack, GetItem, PutDownCounter, WaitCreateCounterMoney, GetCounterMoney }
 
+// 튜토리얼 화살표의 정보를 저장하기 위한 클래스
 [Serializable]
 public class TutorialInfo
 {
@@ -19,42 +20,45 @@ public class TutorialInfo
 
 public class TutorialManager : MonoBehaviour
 {
-    [SerializeField] List<TutorialInfo> tutorialArrows;
+    [Header("Object")]
+    [Tooltip("튜토리얼 화살표 리스트")][SerializeField] List<TutorialInfo> tutorialArrows;
 
-
-    [SerializeField] GameObject playerArrow;
-
-    Coroutine tutorialArrowCoroutine = null;
-
-    [SerializeField] TutorialProgressType nowType;
-    [SerializeField] TutorialType followType;
-
+    [Header("Player")]
+    [Tooltip("플레이어 주위를 회전하는 화살표")][SerializeField] GameObject playerArrow;
 
     [Header("시작 커서")]
-    [SerializeField] GameObject infinityImg;
-    [SerializeField] GameObject cursorImg;
-    [SerializeField] Vector3 cursorStartPos;
+    [Tooltip("무한대 이미지")][SerializeField] GameObject infinityImg;
+    [Tooltip("커서 이미지")][SerializeField] GameObject cursorImg;
+    [Tooltip("무한대를 그리는 시작점")][SerializeField] Vector3 cursorStartPos;
+    [Tooltip("무한대를 그리는 속도")][SerializeField] float speed = 1f;
+    [Tooltip("무한대 경로 X크기")][SerializeField] float sizeX = 1f;
+    [Tooltip("무한대 경로 y크기")][SerializeField] float sizeY = 1f;
 
-    [SerializeField] float speed = 1f;
-    [SerializeField] float sizeX = 1f;
-    [SerializeField] float sizeY = 1f;
-    Coroutine drawInfinity = null;
+    [Header("Data")]
+    [Tooltip("현재 진행중인 튜토리얼")][SerializeField] TutorialProgressType nowType;
+    [Tooltip("플레이어 주변 화살표가 가리킬 오브젝트 타입")][SerializeField] TutorialType followType;
 
+    Coroutine tutorialArrowCoroutine = null; // 중복방지 코루틴
+
+    #region Life Cycle
     private void OnEnable()
     {
         tutorialArrows.ForEach(x => x.arrow.gameObject.SetActive(false));
 
         StartCoroutine(TutorialProgressCoroutine());
         StartCoroutine(DrawInfinity());
-
     }
+    #endregion
 
 
+    #region Public method
+    // 오브젝트 위의 화살표 활성화
     public void SetTutorialArrow(TutorialType type, bool active)
     {
         tutorialArrows.Find(x => x.type.Equals(type)).arrow.gameObject.SetActive(active);
     }
 
+    // 플레이어에게 경로를 알려주는 화살표 코루틴 실행 (중복 방지)
     public void SetPlayerTutorialArrow()
     {
         if (tutorialArrowCoroutine != null)
@@ -63,12 +67,13 @@ public class TutorialManager : MonoBehaviour
             tutorialArrowCoroutine = null;
         }
 
-        tutorialArrowCoroutine = StartCoroutine(TutorialArrowCoroutine());
+        tutorialArrowCoroutine = StartCoroutine(PlayerTutorialArrowCoroutine());
     }
+    #endregion
 
-
-
-    bool IsTutorialFinish(TutorialProgressType type)
+    #region Private Method
+    // 현재 진행중인 튜토리얼이 종료되었는지 확인
+    private bool IsTutorialFinish(TutorialProgressType type)
     {
         if (GameManager.Instance == null || GameManager.Instance.player == null) return false;
 
@@ -113,8 +118,11 @@ public class TutorialManager : MonoBehaviour
                 return false;
         }
     }
+    #endregion
 
-    IEnumerator TutorialArrowCoroutine()
+    #region Coroutine
+    // 플레이어 주변을 회전하는 화살표 코루틴
+    IEnumerator PlayerTutorialArrowCoroutine()
     {
         Transform nowTarget = tutorialArrows.Find(x => x.type.Equals(followType)).arrow.transform;
         playerArrow.SetActive(true);
@@ -132,6 +140,8 @@ public class TutorialManager : MonoBehaviour
         playerArrow.SetActive(false);
         tutorialArrowCoroutine = null;
     }
+
+    // 튜토리얼 메인 진행 코루틴
     IEnumerator TutorialProgressCoroutine()
     {
         // 광산
@@ -180,9 +190,12 @@ public class TutorialManager : MonoBehaviour
 
         Debug.Log($"돈 습득");
         SetTutorialArrow(TutorialType.CounterMoney, false);
+        // 첫 번째 UpgradeZone 활성화
+        UpgradeManager.Instance.SetUpgradeZone(UpgradeType.Weapon2, true);
     }
 
-    private IEnumerator DrawInfinity()
+    // 게임 시작 시, 터치 감지하는 코루틴
+    IEnumerator DrawInfinity()
     {
         float time = 0f;
 
@@ -201,4 +214,5 @@ public class TutorialManager : MonoBehaviour
 
         infinityImg.SetActive(false);
     }
+    #endregion
 }

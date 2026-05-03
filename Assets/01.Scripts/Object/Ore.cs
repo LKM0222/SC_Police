@@ -10,35 +10,34 @@ public class Ore : MonoBehaviour
     [Tooltip("광물 실제 오브젝트")][SerializeField] GameObject obj;
     [Tooltip("광물의 체력")][SerializeField] float hp = 2;
     [Tooltip("파괴 후, 다시 리스폰되는 시간")][SerializeField] float respawnTime;
-    public bool isDestory => !obj.activeSelf;
-
+    [Tooltip("현재 캐고있는 광물의 주인")]public GameObject own;
 
     [Header("VFX")]
     [Tooltip("광물이 파괴되었을 때, 출력할 이펙트")][SerializeField] ParticleSystem destoryParticle;
 
+    // 코루틴 중복방지
     Coroutine respawnCoroutine = null;
-    Player player;
-
-    public GameObject own; // 현재 캐고있는 광물 주인
-
-
-
-
-    public void Init(Player player)
+    
+    // 프로퍼티
+    public bool isDestory => !obj.activeSelf;
+    
+    #region Public Method
+    public void Init()
     {
-        this.player = player;
         Spawn();
     }
 
+    // 오브젝트 스폰했을 떄
     public void Spawn()
     {
         obj.SetActive(true);
         own = null;
+        hp = 2;
         destoryParticle.gameObject.SetActive(false);
     }
 
-    // 캐릭터가 광물을 캘때(플레이어, NPC 포함)
-    public void Mined(float atk)
+    // 플레이어가 광물을 캘 때
+    public void Mined_Player(float atk)
     {
         if (isDestory) return;
 
@@ -51,52 +50,37 @@ public class Ore : MonoBehaviour
         // 체력이 0일때 파괴
         if (hp <= 0)
         {
+            GameManager.Instance.player.DestroyOre(this);
+            GameManager.Instance.player.GetObject(ObjectType.Ore);
             Destory();
         }
     }
 
-    public bool WorkersMined(float atk)
+    // 일꾼이 광물을 캘 때
+    public void Mind_Workers(float atk)
     {
+        if (isDestory) return;
+
         PlaySound(1);
-        if(!destoryParticle.gameObject.activeSelf) destoryParticle.gameObject.SetActive(true);
+        if (!destoryParticle.gameObject.activeSelf) destoryParticle.gameObject.SetActive(true);
         destoryParticle.Play();
 
-        if (isDestory)
+        hp -= atk;
+
+        // 체력이 0일때 파괴
+        if (hp <= 0)
         {
-            //머신에 +1 해줘야됨.
             GameManager.Instance.machine.AddOre(1);
-            return true;
-        }
-        else
-        {
-            hp -= atk;
-
-            // 체력이 0일때 파괴
-            if (hp <= 0)
-            {
-                obj.SetActive(false);
-                GameManager.Instance.machine.AddOre(1);
-
-                // 리스폰 코루틴 실행
-                if (respawnCoroutine != null)
-                {
-                    StopCoroutine(respawnCoroutine);
-                    respawnCoroutine = null;
-                }
-
-                respawnCoroutine = StartCoroutine(RespawnCoroutine());
-            }
-
-            return false;
+            Destory();
         }
     }
+    #endregion
 
+    #region Private Method
     private void Destory()
     {
-        obj.SetActive(false);
-        player.DestroyOre(this);
-        player.GetObject(ObjectType.Ore);
 
+        obj.SetActive(false);
         // 리스폰 코루틴 실행
         if (respawnCoroutine != null)
         {
@@ -107,16 +91,18 @@ public class Ore : MonoBehaviour
         respawnCoroutine = StartCoroutine(RespawnCoroutine());
     }
 
-    IEnumerator RespawnCoroutine()
-    {
-        yield return new WaitForSeconds(respawnTime);
-        Spawn();
-    }
-
-
     private void PlaySound(int level)
     {
         if (level == 1) SoundManager.Instance.PlaySound(SoundType.Mining_level1);
         else SoundManager.Instance.PlaySound(SoundType.Mining_level2);
     }
+    #endregion
+    
+    #region Coroutine
+    IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respawnTime);
+        Spawn();
+    }
+    #endregion
 }

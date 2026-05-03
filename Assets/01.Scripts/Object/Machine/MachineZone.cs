@@ -4,22 +4,25 @@ using UnityEngine;
 
 public class MachineZone : MonoBehaviour
 {
-    [SerializeField] MakeMachine machine; // 제작기계
-    [SerializeField] SpriteRenderer zoneImg;
+    [Header("Obj")]
+    [Tooltip("플레이어 입장 시, 색상 변경을 위한 SpriteRendere")][SerializeField] SpriteRenderer zoneImg;
+
+    // 중복 방지 코루틴
     Coroutine enterZoneCoroutine = null;
 
+    #region Trigger
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer.Equals(3))
         {
             var player = other.GetComponent<Player>();
-            
+
             if (enterZoneCoroutine != null)
             {
                 StopCoroutine(enterZoneCoroutine);
                 enterZoneCoroutine = null;
             }
-            
+
             enterZoneCoroutine = StartCoroutine(EnterZoneCoroutine(player));
         }
     }
@@ -31,12 +34,14 @@ public class MachineZone : MonoBehaviour
             zoneImg.color = Color.white;
         }
     }
+    #endregion
 
+    #region Coroutine
     IEnumerator EnterZoneCoroutine(Player player)
     {
         zoneImg.color = Color.green;
         int playerOreCount = player.ReturnObj(ObjectType.Ore);
-        machine.AddOre(playerOreCount);
+        GameManager.Instance.machine.AddOre(playerOreCount);
 
         if (playerOreCount > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking);
 
@@ -53,4 +58,5 @@ public class MachineZone : MonoBehaviour
 
         enterZoneCoroutine = null;
     }
+    #endregion
 }

@@ -12,12 +12,13 @@ public class GameManager : MonoSingleton<GameManager>
     [Tooltip("현재 움직일 수 있는 상황인지 (카메라 전환중이 아닌지)")]
     public bool canInput = true; // 움직일 수 있는지
 
-
-    public Player player;
-    public MakeMachine machine;
-    public Counter counter;
+    [Header("Refrence")]
+    [Tooltip("플레이어 오브젝트")]public Player player;
+    [Tooltip("제작 기계 오브젝트")]public MakeMachine machine;
+    [Tooltip("카운터 오브젝트")]public Counter counter;
+    [Tooltip("감옥 오브젝트")] public Prison prison;
 
 
     [Header("Data")]
-    public int money; // 가지고있는 돈
+    [Tooltip("플레이어가 가지고 있는 돈")]public int money; // 가지고있는 돈
 }

@@ -2,26 +2,31 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
-[Serializable]
-public enum UpgradeType {Weapon2, Weapon3, NPC, MineWorker, Prison}
+[Serializable] public enum UpgradeType {Weapon2, Weapon3, NPC, MineWorker, Prison}
 
 public class UpgradeZone : MonoBehaviour
 {
-    [SerializeField] UpgradeType upgradeType;
-    [SerializeField] SpriteRenderer fillImg;
-    [SerializeField] Transform fillImgTransform;
+    [Header("Data")]
+    [Tooltip("현재 업그레이드의 타입")][SerializeField] UpgradeType upgradeType;
+    [Tooltip("업그레이드를 위한 필요금액")][SerializeField] int needMoneyCount;
+    [Tooltip("현재까지 업그레이드에 지불한 금액")][SerializeField] int nowMoneyCount;
 
-    [SerializeField] TMP_Text moneyText;
-    [SerializeField] int needMoneyCount;
-    [SerializeField] int nowMoneyCount;
+    [Header("Fill")]
+    [Tooltip("업그레이드가 얼마나 진행되었는지 나타내는 FillImg")][SerializeField] SpriteRenderer fillImg;
+    [Tooltip("FillImg의 크기를 변경하면서 위치를 조정하기 위한 FillImg Transform")][SerializeField] Transform fillImgTransform;
 
-    [SerializeField] GameObject virtualCam;
+    [Header("UI")]
+    [Tooltip("현재 영역 업그레이드를 위해 남은 돈 표시 텍스트")][SerializeField] TMP_Text moneyText;
 
+    [Header("Cam")]
+    [Tooltip("개방 시, 강조해야한다면, 캠 등록 (없으면 뛰어넘음 Null가능)")][SerializeField] GameObject virtualCam;
+
+    // 중복 실행 방지 코루틴
     Coroutine payMoneyCoroutine = null;
 
+    #region Life Cycle
     void OnEnable()
     {
         StartCoroutine(EnableCoroutine());
@@ -31,7 +36,9 @@ public class UpgradeZone : MonoBehaviour
     {
         SetUpgradeZoneState();
     }
+    #endregion
 
+    #region Private Method
     private void SetUpgradeZoneState()
     {
         // Fill관리, 텍스트 수정
@@ -39,7 +46,9 @@ public class UpgradeZone : MonoBehaviour
         fillImgTransform.localPosition = new Vector3(0f, 0.45f, -1.3f * (1 - ((float)nowMoneyCount / needMoneyCount)));
         moneyText.text = (needMoneyCount - nowMoneyCount).ToString();
     }
+    #endregion
 
+    #region Trigger
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer.Equals(3))
@@ -67,7 +76,9 @@ public class UpgradeZone : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Coroutine
     IEnumerator PayMoneyCoroutine(Player player)
     {
         yield return null;
@@ -98,4 +109,5 @@ public class UpgradeZone : MonoBehaviour
         virtualCam.SetActive(false);
         GameManager.Instance.canInput = true;
     }
+    #endregion
 }

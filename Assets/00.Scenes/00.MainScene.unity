@@ -1756,14 +1756,14 @@ MonoBehaviour:
   - type: 4
     arrow: {fileID: 638946172}
   playerArrow: {fileID: 1757119431}
-  nowType: 0
-  followType: 0
   infinityImg: {fileID: 982206482}
   cursorImg: {fileID: 1543023121}
   cursorStartPos: {x: 50, y: -50, z: 0}
   speed: 5
   sizeX: -100
   sizeY: -50
+  nowType: 0
+  followType: 0
 --- !u!1001 &91456856
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5606,7 +5606,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moneyText: {fileID: 486216067}
-  IntroUI: {fileID: 0}
 --- !u!1 &317590721
 GameObject:
   m_ObjectHideFlags: 0
@@ -7966,7 +7965,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b999b8e55e558b44a4a61f585dec02c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  machine: {fileID: 1094994162}
 --- !u!1001 &445000886
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8264,11 +8262,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upgradeType: 4
+  needMoneyCount: 20
+  nowMoneyCount: 0
   fillImg: {fileID: 909815724}
   fillImgTransform: {fileID: 909815723}
   moneyText: {fileID: 298083255}
-  needMoneyCount: 20
-  nowMoneyCount: 0
   virtualCam: {fileID: 1333945063}
 --- !u!65 &456215671
 BoxCollider:
@@ -9689,8 +9687,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 540317431}
-  - component: {fileID: 540317434}
   - component: {fileID: 540317432}
+  - component: {fileID: 540317434}
   - component: {fileID: 540317433}
   m_Layer: 5
   m_Name: PlayerController
@@ -10047,7 +10045,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 854b9f811e6d3884d8240567ce57169b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  machine: {fileID: 1094994162}
   zoneImg: {fileID: 646742992}
 --- !u!65 &596756610
 BoxCollider:
@@ -10463,11 +10460,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upgradeType: 1
+  needMoneyCount: 15
+  nowMoneyCount: 0
   fillImg: {fileID: 1096557170}
   fillImgTransform: {fileID: 1096557169}
   moneyText: {fileID: 1255914764}
-  needMoneyCount: 15
-  nowMoneyCount: 0
   virtualCam: {fileID: 0}
 --- !u!65 &623197180
 BoxCollider:
@@ -11552,6 +11549,7 @@ MonoBehaviour:
   player: {fileID: 741509040}
   machine: {fileID: 1094994162}
   counter: {fileID: 1946218978}
+  prison: {fileID: 1039603465}
   money: 0
 --- !u!1 &723085485
 GameObject:
@@ -16031,7 +16029,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 526c40d81ba1284459cede001564250b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  counter: {fileID: 1946218978}
 --- !u!1 &1008571622
 GameObject:
   m_ObjectHideFlags: 0
@@ -16209,14 +16206,12 @@ MonoBehaviour:
   - {fileID: 1580264342}
   - {fileID: 1803606877}
   - {fileID: 1177417072}
-  startPos: {fileID: 524489611}
   prisonList: []
   waitList: []
-  buyFinishMT: {fileID: 2100000, guid: a81b478ece737e84b8ccad6ca04fc685, type: 2}
-  counter: {fileID: 1946218978}
-  prison: {fileID: 1039603465}
   customerPrefab: {fileID: 1672822848808009527, guid: f4f0e8db37cc028469434ec59a75d87b,
     type: 3}
+  startPos: {fileID: 524489611}
+  buyFinishMT: {fileID: 2100000, guid: a81b478ece737e84b8ccad6ca04fc685, type: 2}
 --- !u!1 &1023732122
 GameObject:
   m_ObjectHideFlags: 0
@@ -16404,7 +16399,7 @@ GameObject:
   - component: {fileID: 1039603464}
   - component: {fileID: 1039603465}
   m_Layer: 0
-  m_Name: Preson
+  m_Name: Prison
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16446,8 +16441,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afb7193ca541df847af4b6528f12d6ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   maxCount: 20
+  count: 0
   backWall: {fileID: 27571108}
   addArea: {fileID: 1753890618}
   countText: {fileID: 860503830}
@@ -17798,6 +17793,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fd3e2ceb69f2cf42b8678e23b8fc53d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mineLevel: 1
+  prison: {fileID: 1039603465}
+  workerList:
+  - {fileID: 1707479819}
+  - {fileID: 1419121119}
+  npc: {fileID: 1883226595}
   upgradeObjectList:
   - upgardeType: 0
     upgradeObj: {fileID: 1965343523}
@@ -17809,13 +17810,6 @@ MonoBehaviour:
     upgradeObj: {fileID: 2046571026}
   - upgardeType: 4
     upgradeObj: {fileID: 456215668}
-  mineLevel: 1
-  prison: {fileID: 1039603465}
-  workerList:
-  - {fileID: 1707479819}
-  - {fileID: 1419121119}
-  npc: {fileID: 1883226595}
-  isGetMoneyFirst: 0
 --- !u!1001 &1170601152
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20574,11 +20568,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upgradeType: 2
+  needMoneyCount: 10
+  nowMoneyCount: 0
   fillImg: {fileID: 689212437}
   fillImgTransform: {fileID: 689212436}
   moneyText: {fileID: 335971386}
-  needMoneyCount: 10
-  nowMoneyCount: 0
   virtualCam: {fileID: 0}
 --- !u!65 &1396930428
 BoxCollider:
@@ -20983,10 +20977,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccdee30aeb608ce48bd773632de6fd6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nav: {fileID: 1419121116}
   atk: 1
   atkSpd: 2
   nowTarget: {fileID: 0}
+  nav: {fileID: 1419121116}
 --- !u!4 &1419121120
 Transform:
   m_ObjectHideFlags: 0
@@ -25042,10 +25036,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccdee30aeb608ce48bd773632de6fd6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nav: {fileID: 1707479818}
   atk: 1
   atkSpd: 2
   nowTarget: {fileID: 0}
+  nav: {fileID: 1707479818}
 --- !u!23 &1707479820
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -27376,7 +27370,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0b18d59220e3e341a7c2f710de24bb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nav: {fileID: 1883226600}
   itemTransform: {fileID: 438859020}
   counterTransform: {fileID: 1554196529}
   itemList:
@@ -27390,6 +27383,7 @@ MonoBehaviour:
   - {fileID: 1178377170}
   - {fileID: 322827617}
   - {fileID: 1818931474}
+  nav: {fileID: 1883226600}
   itemCount: 0
 --- !u!23 &1883226596
 MeshRenderer:
@@ -29243,11 +29237,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upgradeType: 0
+  needMoneyCount: 10
+  nowMoneyCount: 0
   fillImg: {fileID: 1836830118}
   fillImgTransform: {fileID: 1836830117}
   moneyText: {fileID: 1394262624}
-  needMoneyCount: 10
-  nowMoneyCount: 0
   virtualCam: {fileID: 769757614}
 --- !u!1 &1971726467 stripped
 GameObject:
@@ -29977,7 +29971,6 @@ MonoBehaviour:
   orePrefab: {fileID: 6724964832855635467, guid: 42822c8774339ed4296d9a9aeb8b9970,
     type: 3}
   array: {x: 8, y: 17}
-  player: {fileID: 741509040}
   oreList: []
 --- !u!1 &2043029091
 GameObject:
@@ -30151,11 +30144,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upgradeType: 3
+  needMoneyCount: 15
+  nowMoneyCount: 0
   fillImg: {fileID: 1251124175}
   fillImgTransform: {fileID: 1251124174}
   moneyText: {fileID: 1595389745}
-  needMoneyCount: 15
-  nowMoneyCount: 0
   virtualCam: {fileID: 0}
 --- !u!65 &2046571029
 BoxCollider:

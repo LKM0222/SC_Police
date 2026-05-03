@@ -15,7 +15,8 @@ public class ClipInfo
 
 public class SoundManager : MonoSingleton<SoundManager>
 {
-    [SerializeField] List<ClipInfo> clipList;
+    [Header("Data")]
+    [Tooltip("사운드 리스트")][SerializeField] List<ClipInfo> clipList;
 
 
     public void PlaySound(SoundType type)
