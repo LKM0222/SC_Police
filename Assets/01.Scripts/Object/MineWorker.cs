@@ -43,14 +43,10 @@ public class MineWorker : MonoBehaviour
             }
 
             yield return new WaitUntil(() => nav.remainingDistance <= nav.stoppingDistance);
-
-            while (!nowTarget.WorkersMined(atk) && !nowTarget.isDestory)
-            {
-                yield return new WaitForSeconds(atkSpd);
-            }
-
-            nowTarget = null;
-            yield return new WaitForSeconds(0.01f);
+            
+            nowTarget.WorkersMined(atk);
+            if (nowTarget.isDestory) nowTarget = null;
+            yield return new WaitForSeconds(Random.Range(atkSpd, atkSpd + 0.5f));
         }
     }
 

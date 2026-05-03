@@ -43,6 +43,8 @@ public class Ore : MonoBehaviour
         if (isDestory) return;
 
         PlaySound(UpgradeManager.Instance.mineLevel);
+        if(!destoryParticle.gameObject.activeSelf) destoryParticle.gameObject.SetActive(true);
+        destoryParticle.Play();
 
         hp -= atk;
 
@@ -56,6 +58,8 @@ public class Ore : MonoBehaviour
     public bool WorkersMined(float atk)
     {
         PlaySound(1);
+        if(!destoryParticle.gameObject.activeSelf) destoryParticle.gameObject.SetActive(true);
+        destoryParticle.Play();
 
         if (isDestory)
         {
@@ -71,7 +75,6 @@ public class Ore : MonoBehaviour
             if (hp <= 0)
             {
                 obj.SetActive(false);
-                destoryParticle.gameObject.SetActive(true);
                 GameManager.Instance.machine.AddOre(1);
 
                 // 리스폰 코루틴 실행
@@ -91,7 +94,6 @@ public class Ore : MonoBehaviour
     private void Destory()
     {
         obj.SetActive(false);
-        destoryParticle.gameObject.SetActive(true);
         player.DestroyOre(this);
         player.GetObject(ObjectType.Ore);
 
