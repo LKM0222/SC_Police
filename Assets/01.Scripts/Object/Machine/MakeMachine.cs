@@ -144,7 +144,6 @@ public class MakeMachine : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        // if(itemCount > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking); // 아이템이 있는 경우에만 사운드 출력
         returnItemCoroutine = null;
     }
 

@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 // 플레이어의 이동을 담당하는 스크립트입니다.
 // 조이스틱을 활용해, 플레이어의 이동을 구현합니다.
-// 플레이어가 이동할 때, 필요한 애니메이션도 출력합니다.
 
 public class PlayerController : MonoBehaviour, IPointerUpHandler, IDragHandler, IPointerDownHandler
 {
@@ -79,10 +78,6 @@ public class PlayerController : MonoBehaviour, IPointerUpHandler, IDragHandler, 
     {
         //입력값 전달.
         player.Move(inputVector);
-        if (inputVector != Vector2.zero)
-        {
-            // player.charAnim.SetBool(player.charState_Walk, true);
-        }
     }
     #endregion
 }

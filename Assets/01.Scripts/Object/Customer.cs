@@ -54,7 +54,6 @@ public class Customer : MonoBehaviour
     {
         yield return new WaitUntil(() => nav.remainingDistance < 0.01f);
         yield return new WaitUntil(() => GameManager.Instance.counter.GetItemCount() > 0);
-        // yield return new WaitForSeconds(1f); // 잠깐 기다린 후, 구매 시작
 
         for (int i = 0; i < needCount; i++)
         {
