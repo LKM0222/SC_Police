@@ -38,6 +38,8 @@ public class Counter : MonoBehaviour
     public void StackItem(Player player)
     {
         int count = player.ReturnObj(ObjectType.Item);
+
+        if (count <= 0) return;
         if (count > 0) SoundManager.Instance.PlaySound(SoundType.OreStacking);
             
         if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(count));
@@ -46,7 +48,7 @@ public class Counter : MonoBehaviour
     public void StackItem(ServeNPC npc)
     {   
         int count = npc.ReturnItem();
-        
+        if (count <= 0) return;
         if (stackItemCoroutine == null) stackItemCoroutine = StartCoroutine(StackItemCoroutine(count));
     }
 

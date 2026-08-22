@@ -173,7 +173,7 @@ public class TutorialManager : MonoBehaviour
 
         Debug.Log($"아이템 습득");
         SetTutorialArrow(TutorialType.MachineStack, false);
-        yield return new WaitUntil(() => IsTutorialFinish(TutorialProgressType.GetItem));
+        playerArrow.SetActive(false);
 
         nowType = TutorialProgressType.PutDownCounter;
         followType = TutorialType.Counter;
